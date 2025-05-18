@@ -709,6 +709,11 @@ class CogVideoXImageToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
             batch_size = len(prompt)
         else:
             batch_size = prompt_embeds.shape[0]
+	
+        try:
+            transfer_timestep
+        except NameError:
+            transfer_timestep = 40
 
         device = self._execution_device
 
@@ -759,7 +764,7 @@ class CogVideoXImageToVideoPipeline(DiffusionPipeline, CogVideoXLoraLoaderMixin)
             for i, t in enumerate(timesteps):
                 if self.interrupt:
                     continue
-
+                flag = False
                 if high_timesteps is not None:
                     if 700 < t <= transfer_timestep:
                         reweight_scale = self.cos_reweight(t, high_timesteps * 1000)
